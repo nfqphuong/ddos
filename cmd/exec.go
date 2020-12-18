@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/nfqphuong/ddos/util"
 )
 
 // Executor - helps execute the command
@@ -27,7 +31,24 @@ func (e Executor) Terminate() {
 
 // NewExecutor - create new executor
 func NewExecutor() *Executor {
+	output := os.Stderr
+	var (
+		cFlag = flag.Int("c", 1, "total number of threads")
+		nFlag = flag.Int("n", 1, "total number of requests")
+		oFlag = flag.String("o", "", "write output to a file")
+	)
+	fmt.Println(*oFlag, *cFlag, *nFlag)
+	flag.Parse()
+	if len(*oFlag) > 0 {
+		fmt.Println("----- wtf")
+		f, err := util.GetOutputFile(*oFlag)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		output = f
+	}
+
 	return &Executor{
-		&CommandConfig{os.Stderr},
+		&CommandConfig{*cFlag, *nFlag, output},
 	}
 }
